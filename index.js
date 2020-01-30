@@ -89,19 +89,20 @@ function validCommand(command) {
  * @param {Message} msg
  */
 function onMessage(msg) {
-  if (msg.message.startsWith('!led')) {
-    if (users[msg.author.channelId]) return false;
-    const parts = msg.message.split(' ');
+  const { message, author } = msg;
+  if (message.startsWith('!led')) {
+    if (users[author.channelId]) return false;
+    const parts = message.split(' ');
     if (parts.length <= 1) return false;
     const command = parts[1];
     if (validCommand(command)) {
-      users[msg.author.channelId] = true;
+      users[author.channelId] = true;
       const value = Number.parseInt(command, 2);
       values.push({
-        name: msg.author.displayName, command, value
+        name: author.displayName, command, value
       });
       setTimeout(() => {
-        users[msg.author.channelId] = false;
+        users[author.channelId] = false;
       }, 30000);
     }
   }
