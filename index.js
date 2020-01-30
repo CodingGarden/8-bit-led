@@ -12,18 +12,19 @@ let register;
 /**
  * @typedef ValueItem
  * @prop {string} name
- * @prop {string} command
+ * @prop {string} part
  * @prop {number} value
  */
 
+ /** @type {Set<string>} */
 const users = new Set();
 /** @type {ValueItem[]} */
 const values = [];
 
 setInterval(() => {
   if (!values.length || !register) return false;
-  const { name, command, value } = values.shift();
-  console.log(name, command, value);
+  const { name, part, value } = values.shift();
+  console.log(name, part, value);
   register.send(value);
 }, 2000);
 
@@ -56,11 +57,11 @@ function getLiveChatId() {
 }
 
 /**
- * @param {string} command
+ * @param {string} part
  * @return {boolean}
  */
-function validBinaryPart(command) {
-  return command.match(/^[01]{8}$/) !== null;
+function validBinaryPart(part) {
+  return part.match(/^[01]{8}$/) !== null;
 }
 
 /**
@@ -117,12 +118,12 @@ function ledCommand(command) {
   if (users.has(author.channelId)) return false;
   const parts = message.split(' ');
   if (parts.length <= 1) return false;
-  const command = parts[1];
-  if (!validBinaryPart(command)) return false;
+  const firstPart = parts[0];
+  if (!validBinaryPart(firstPart)) return false;
   users.add(author.channelId);
-  const value = Number.parseInt(command, 2);
+  const value = Number.parseInt(firstPart, 2);
   values.push({
-    name: author.displayName, command, value
+    name: author.displayName, part: firstPart, value
   });
   setTimeout(() => {
     users.delete(author.channelId);
