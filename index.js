@@ -6,7 +6,7 @@ const board = new Board();
 
 function validCommand(command) {
   if (command.length !== 8) return false;
-  return [...command.slice(2)].every(d => d === '0' || d === '1');
+  return [...command].every(d => d === '0' || d === '1');
 }
 
 const users = {};
