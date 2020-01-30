@@ -1,0 +1,17 @@
+{
+  "name": "led-button",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "CJ R. <cj@null.computer> (https://w3cj.now.sh)",
+  "license": "MIT",
+  "dependencies": {
+    "johnny-five": "^1.4.0",
+    "node-fetch": "^2.6.0",
+    "socket.io-client": "^2.3.0"
+  }
+}
