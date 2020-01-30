@@ -9,7 +9,15 @@ const board = new Board();
 /** @type {ShiftRegister} */
 let register;
 
+/**
+ * @typedef ValueItem
+ * @prop {string} name
+ * @prop {string} command
+ * @prop {number} value
+ */
+
 const users = {};
+/** @type {ValueItem[]} */
 const values = [];
 
 setInterval(() => {
@@ -33,6 +41,9 @@ board.on('ready', async () => {
   });
 });
 
+/**
+ * @returns {Promise<string>}
+ */
 function getLiveChatId() {
   return fetch(`${serverUrl}/streams`)
     .then(res => res.json())
@@ -44,25 +55,53 @@ function getLiveChatId() {
     });
 }
 
+/**
+ * @param {string} command
+ * @return {boolean}
+ */
 function validCommand(command) {
   if (command.length !== 8) return false;
   return [...command].every(d => d === '0' || d === '1');
 }
 
-function onMessage(message) {
-  if (message.message.startsWith('!led')) {
-    if (users[message.author.channelId]) return false;
-    const parts = message.message.split(' ');
+/**
+ * @typedef Author
+ * @prop {string} channelId
+ * @prop {string} channelUrl
+ * @prop {string} displayName
+ * @prop {boolean} isChatModerator
+ * @prop {boolean} isChatOwner
+ * @prop {boolean} isChatSponsor
+ * @prop {boolean} isVerified
+ * @prop {string} profileImageUrl
+ */
+
+/**
+ * @typedef Message
+ * @prop {Author} author
+ * @prop {string} id
+ * @prop {string} message
+ * @prop {'twitch' | 'youtube'} platform
+ * @prop {string} publishedAt
+ */
+
+/**
+ * @param {Message} msg
+ */
+function onMessage(msg) {
+  if (msg.message.startsWith('!led')) {
+    if (users[msg.author.channelId]) return false;
+    const parts = msg.message.split(' ');
     if (parts.length <= 1) return false;
     const command = parts[1];
     if (validCommand(command)) {
-      users[message.author.channelId] = true;
+      users[msg.author.channelId] = true;
       const value = Number.parseInt(command, 2);
       values.push({
-        name: message.author.displayName, command, value
+        name: msg.author.displayName, command, value
       });
       setTimeout(() => {
-        users[message.author.channelId] = false;
+        users[msg.author.channelId] = false;
       }, 30000);
     }
   }
