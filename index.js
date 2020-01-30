@@ -86,24 +86,46 @@ function validCommand(command) {
  */
 
 /**
+ * @typedef CommandType
+ * @prop {string[]} parts
+ * @prop {string} commandName
+ */
+
+/**
+ * @typedef {Message & CommandType} Command
+ */
+
+/**
  * @param {Message} msg
  */
 function onMessage(msg) {
-  const { message, author } = msg;
-  if (message.startsWith('!led')) {
-    if (users.has(author.channelId)) return false;
-    const parts = message.split(' ');
-    if (parts.length <= 1) return false;
-    const command = parts[1];
-    if (validCommand(command)) {
-      users.add(author.channelId);
-      const value = Number.parseInt(command, 2);
-      values.push({
-        name: author.displayName, command, value
-      });
-      setTimeout(() => {
-        users.delete(author.channelId);
-      }, 30000);
-    }
+  const { message } = msg;
+  if (!message.startsWith('!')) return false;
+  const parts = message.slice(1).split(' ');
+  const commandName = parts.shift().toLowerCase();
+  /** @type {Command} */
+  const command = { ...msg, commandName, parts };
+  if (command === 'led') {
+    ledCommand(command);
   }
+}
+
+/**
+ * @param {Command} command
+ */
+function ledCommand(command) {
+  const { message, author, parts } = command;
+  if (users.has(author.channelId)) return false;
+  const parts = message.split(' ');
+  if (parts.length <= 1) return false;
+  const command = parts[1];
+  if (!validCommand(command)) return false;
+  users.add(author.channelId);
+  const value = Number.parseInt(command, 2);
+  values.push({
+    name: author.displayName, command, value
+  });
+  setTimeout(() => {
+    users.delete(author.channelId);
+  }, 30000);
 }
