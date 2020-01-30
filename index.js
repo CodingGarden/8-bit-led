@@ -9,16 +9,9 @@ const board = new Board();
 /** @type {ShiftRegister} */
 let register;
 
-/**
- * @typedef ValueItem
- * @prop {string} name
- * @prop {string} part
- * @prop {number} value
- */
-
  /** @type {Set<string>} */
 const users = new Set();
-/** @type {ValueItem[]} */
+/** @type {import('./types').ValueItem[]} */
 const values = [];
 
 setInterval(() => {
@@ -43,17 +36,22 @@ board.on('ready', async () => {
 });
 
 /**
+ * @returns {Promise<import('./types').Stream[]>}
+ */
+async function getStreams() {
+  const res = fetch(`${serverUrl}/streams`);
+  return res.json();
+}
+
+/**
  * @returns {Promise<string>}
  */
-function getLiveChatId() {
-  return fetch(`${serverUrl}/streams`)
-    .then(res => res.json())
-    .then(([ event ]) => {
-      if (event) {
-        return event.snippet.liveChatId;
-      }
-      return new Date().toLocaleDateString();
-    });
+async function getLiveChatId() {
+  const [ event ] = await getStreams();
+  if (event) {
+    return event.snippet.liveChatId;
+  }
+  return new Date().toLocaleDateString();
 }
 
 /**
@@ -65,38 +63,7 @@ function validBinaryPart(part) {
 }
 
 /**
- * @typedef Author
- * @prop {string} channelId
- * @prop {string} channelUrl
- * @prop {string} displayName
- * @prop {boolean} isChatModerator
- * @prop {boolean} isChatOwner
- * @prop {boolean} isChatSponsor
- * @prop {boolean} isVerified
- * @prop {string} profileImageUrl
- */
-
-/**
- * @typedef Message
- * @prop {Author} author
- * @prop {string} id
- * @prop {string} message
- * @prop {'twitch' | 'youtube'} platform
- * @prop {string} publishedAt
- */
-
-/**
- * @typedef CommandType
- * @prop {string[]} parts
- * @prop {string} commandName
- */
-
-/**
- * @typedef {Message & CommandType} Command
- */
-
-/**
- * @param {Message} msg
+ * @param {import('./types').Message} msg
  */
 function onMessage(msg) {
   const { message } = msg;
@@ -111,7 +78,7 @@ function onMessage(msg) {
 }
 
 /**
- * @param {Command} command
+ * @param {import('./types').Command} command
  */
 function ledCommand(command) {
   const { message, author, parts } = command;
