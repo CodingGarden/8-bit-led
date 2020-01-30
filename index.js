@@ -59,9 +59,8 @@ function getLiveChatId() {
  * @param {string} command
  * @return {boolean}
  */
-function validCommand(command) {
-  if (command.length !== 8) return false;
-  return [...command].every(d => d === '0' || d === '1');
+function validBinaryPart(command) {
+  return command.match(/^[01]{8}$/) !== null;
 }
 
 /**
@@ -119,7 +118,7 @@ function ledCommand(command) {
   const parts = message.split(' ');
   if (parts.length <= 1) return false;
   const command = parts[1];
-  if (!validCommand(command)) return false;
+  if (!validBinaryPart(command)) return false;
   users.add(author.channelId);
   const value = Number.parseInt(command, 2);
   values.push({
