@@ -16,7 +16,7 @@ let register;
  * @prop {number} value
  */
 
-const users = {};
+const users = new Set();
 /** @type {ValueItem[]} */
 const values = [];
 
@@ -91,18 +91,18 @@ function validCommand(command) {
 function onMessage(msg) {
   const { message, author } = msg;
   if (message.startsWith('!led')) {
-    if (users[author.channelId]) return false;
+    if (users.has(author.channelId)) return false;
     const parts = message.split(' ');
     if (parts.length <= 1) return false;
     const command = parts[1];
     if (validCommand(command)) {
-      users[author.channelId] = true;
+      users.add(author.channelId);
       const value = Number.parseInt(command, 2);
       values.push({
         name: author.displayName, command, value
       });
       setTimeout(() => {
-        users[author.channelId] = false;
+        users.delete(author.channelId);
       }, 30000);
     }
   }
