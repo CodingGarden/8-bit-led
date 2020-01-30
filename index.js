@@ -13,11 +13,10 @@ const users = {};
 const values = [];
 
 setInterval(() => {
-  if (values.length) {
-    const { name, command, value } = values.shift();
-    console.log(name, command, value);
-    register.send(value);
-  }
+  if (!values.length || !register) return false;
+  const { name, command, value } = values.shift();
+  console.log(name, command, value);
+  register.send(value);
 }, 2000);
 
 board.on('ready', async () => {
