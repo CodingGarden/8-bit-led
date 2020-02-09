@@ -72,7 +72,7 @@ function onMessage(msg) {
   const commandName = parts.shift().toLowerCase();
   /** @type {Command} */
   const command = { ...msg, commandName, parts };
-  if (command === 'led') {
+  if (commandName === 'led') {
     ledCommand(command);
   }
 }
@@ -83,7 +83,6 @@ function onMessage(msg) {
 function ledCommand(command) {
   const { message, author, parts } = command;
   if (users.has(author.channelId)) return false;
-  const parts = message.split(' ');
   if (parts.length <= 1) return false;
   const firstPart = parts[0];
   if (!validBinaryPart(firstPart)) return false;
