@@ -14,6 +14,7 @@ const ledCommandUsers = new Set();
 /** @type {import('./types').ValueItem[]} */
 const values = [];
 
+// Get a value to send to the register every 2 seconds.
 setInterval(() => {
   if (!values.length || !register) return false;
   const { name, part, value } = values.shift();
@@ -78,20 +79,34 @@ function onMessage(msg) {
 }
 
 /**
+ * Explicitly set the state of the LEDs.
+ *
+ * A user sends this message:
+ * 
+ *     !led 10101001
+ * 
+ * This command interprets the first, required part as an 8-bit number and
+ * updates the shift register to light up LEDs in the same pattern.
+ *
  * @param {import('./types').Command} command
  */
 function ledCommand(command) {
   const { message, author, parts } = command;
   if (parts.length <= 1) return false;
+  // Validate that a user had not tried to use this command within 30 seconds of
+  // their last use.
   if (ledCommandUsers.has(author.channelId)) return false;
   const firstPart = parts[0];
+  // Validate a part as an 8-bit binary string.
   if (!validBinaryPart(firstPart)) return false;
+  // Remember the user.
   ledCommandUsers.add(author.channelId);
   const value = Number.parseInt(firstPart, 2);
   values.push({
     name: author.displayName, part: firstPart, value
   });
   setTimeout(() => {
+    // Remove the user from the list after 30 seconds.
     ledCommandUsers.delete(author.channelId);
   }, 30000);
 }
