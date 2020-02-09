@@ -10,7 +10,7 @@ const board = new Board();
 let register;
 
  /** @type {Set<string>} */
-const users = new Set();
+const ledCommandUsers = new Set();
 /** @type {import('./types').ValueItem[]} */
 const values = [];
 
@@ -82,16 +82,16 @@ function onMessage(msg) {
  */
 function ledCommand(command) {
   const { message, author, parts } = command;
-  if (users.has(author.channelId)) return false;
   if (parts.length <= 1) return false;
+  if (ledCommandUsers.has(author.channelId)) return false;
   const firstPart = parts[0];
   if (!validBinaryPart(firstPart)) return false;
-  users.add(author.channelId);
+  ledCommandUsers.add(author.channelId);
   const value = Number.parseInt(firstPart, 2);
   values.push({
     name: author.displayName, part: firstPart, value
   });
   setTimeout(() => {
-    users.delete(author.channelId);
+    ledCommandUsers.delete(author.channelId);
   }, 30000);
 }
