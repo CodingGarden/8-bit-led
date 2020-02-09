@@ -40,7 +40,7 @@ board.on('ready', async () => {
  * @returns {Promise<import('./types').Stream[]>}
  */
 async function getStreams() {
-  const res = fetch(`${serverUrl}/streams`);
+  const res = await fetch(`${serverUrl}/streams`);
   return res.json();
 }
 
@@ -92,7 +92,7 @@ function onMessage(msg) {
  */
 function ledCommand(command) {
   const { message, author, parts } = command;
-  if (parts.length <= 1) return false;
+  if (parts.length === 0) return false;
   // Validate that a user had not tried to use this command within 30 seconds of
   // their last use.
   if (ledCommandUsers.has(author.channelId)) return false;
