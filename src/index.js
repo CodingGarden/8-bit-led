@@ -2,6 +2,8 @@ const { Board, ShiftRegister } = require('johnny-five');
 const fetch = require('node-fetch');
 const io = require('socket.io-client');
 
+const connectFour = require('./connectFour');
+
 const serverUrl = 'http://localhost:5000';
 
 const socket = io(serverUrl);
@@ -34,6 +36,8 @@ board.on('ready', async () => {
   socket.on(`messages/${liveChatId}`, (messages) => {
     messages.forEach(onMessage);
   });
+
+  connectFour.ready(board);
 });
 
 /**
@@ -71,10 +75,12 @@ function onMessage(msg) {
   if (!message.startsWith('!')) return false;
   const parts = message.slice(1).split(' ');
   const commandName = parts.shift().toLowerCase();
-  /** @type {Command} */
+  /** @type {import('./types').Command} */
   const command = { ...msg, commandName, parts };
   if (commandName === 'led') {
     ledCommand(command);
+  } else if (commandName === 'c4') {
+    connectFour.move(command);
   }
 }
 

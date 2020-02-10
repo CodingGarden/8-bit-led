@@ -12,6 +12,7 @@
   "dependencies": {
     "johnny-five": "^1.4.0",
     "node-fetch": "^2.6.0",
+    "node-pixel": "git+https://github.com/ajfisher/node-pixel.git#j5-firmata-upg",
     "socket.io-client": "^2.3.0"
   }
 }
